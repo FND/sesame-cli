@@ -16,7 +16,8 @@ Options:
     include inferences
   -f
     output format
-    see http://www.openrdf.org/doc/sesame2/system/ch08.html#table-rdf-formats
+    see http://www.openrdf.org/doc/sesame2/system/ch08.html#table-rdf-formats or
+    http://www.openrdf.org/doc/sesame2/system/ch08.html#table-var-binding-formats
   -r <repository>
     select repository
 
@@ -81,15 +82,26 @@ cmd_list() {
 }
 
 cmd_query() {
-	echo "querying: $@"
+	query="$@"
+	if [ -z "$query" ]; then
+		query=`cat -`
+	fi
+	pysrc="import sys; import urllib; print urllib.quote(sys.stdin.read());"
+	query=`echo "$query" | python -c "$pysrc"`
+
+	if [ -z "$format" ]; then
+		format="application/sparql-results+json"
+	fi
+
+	curl -s -H "Accept: $format" "$host/repositories/$repo?query=$query"
 }
 
 cmd_add() {
-	echo "adding: $@"
+	# TODO
 }
 
 cmd_clear() {
-	echo "clearing: $@"
+	# TODO
 }
 
 # util
@@ -127,4 +139,4 @@ list_triples() {
 
 # dispatch
 
-$cmd $args
+$cmd "$args"
