@@ -32,18 +32,18 @@ EOS
 }
 
 while getopts "hir:" option; do
-    case $option in
-        h)
-            usage
-            exit 1
-            ;;
-        i)
-            include_inferences=true
-            ;;
-        r)
-            repo="$OPTARG"
-            ;;
-    esac
+	case $option in
+		h)
+			usage
+			exit 1
+			;;
+		i)
+			include_inferences=true
+			;;
+		r)
+			repo="$OPTARG"
+			;;
+	esac
 done
 shift $(($OPTIND - 1)) # drop option arguments
 
