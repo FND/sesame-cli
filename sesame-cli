@@ -4,7 +4,7 @@ usage() {
 cat << EOS
 Sesame CLI
 
-command-line interface for OpenRDF Sesame triplestore
+command-line interface for OpenRDF Sesame triplestores
 
 Usage:
   $ sesame-cli [options] <host> <command> [arguments]
@@ -34,6 +34,11 @@ Commands:
     current repository will be cleared
 EOS
 }
+
+if [ -z "$@" ]; then
+	usage
+	exit 1
+fi
 
 while getopts "f:hir:" option; do
 	case $option in
@@ -98,10 +103,14 @@ cmd_query() {
 
 cmd_add() {
 	# TODO
+	echo "error: not yet implemented"
+	exit 1
 }
 
 cmd_clear() {
 	# TODO
+	echo "error: not yet implemented"
+	exit 1
 }
 
 # util

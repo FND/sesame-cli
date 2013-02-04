@@ -1,0 +1,30 @@
+Sesame CLI
+
+command-line interface for OpenRDF Sesame triplestores
+
+Usage:
+  $ sesame-cli [options] <host> <command> [arguments]
+
+Options:
+  -h
+    display this help message
+  -i
+    include inferences
+  -f
+    output format
+    see http://www.openrdf.org/doc/sesame2/system/ch08.html#table-rdf-formats or
+    http://www.openrdf.org/doc/sesame2/system/ch08.html#table-var-binding-formats
+  -r <repository>
+    select repository
+
+Commands:
+  list <repos|graphs|triples>
+    display all repositories, contexts or triples
+  query [query]
+    perform SPARQL query (optionally read from STDIN)
+  add [triples]
+    insert triples (as N-Triples; optionally read from STDIN)
+  clear [name]
+    remove all triples within the given repository or graph
+    if name is provided, the respective graph will be cleared - otherwise the
+    current repository will be cleared
