@@ -7,13 +7,15 @@ Sesame CLI
 command-line interface for OpenRDF Sesame triplestore
 
 Usage:
-  $ sesame-cli [options] <host> <repository> <command> [arguments]
+  $ sesame-cli [options] <host> <command> [arguments]
 
 Options:
   -h
     display this help message
   -i
     include inferences
+  -r <repository>
+    select repository
 
 Commands:
   list <repos|graphs|triples>
@@ -29,7 +31,7 @@ Commands:
 EOS
 }
 
-while getopts "hi" option; do
+while getopts "hir:" option; do
     case $option in
         h)
             usage
@@ -38,13 +40,14 @@ while getopts "hi" option; do
         i)
             include_inferences=true
             ;;
+        r)
+            repo="$OPTARG"
+            ;;
     esac
 done
 shift $(($OPTIND - 1)) # drop option arguments
 
 host=${1:?}
-shift
-repo=${1:?}
 shift
 cmd=${1:?}
 cmd="cmd_$cmd" # avoids reserved names / external commands
@@ -54,7 +57,21 @@ args=$@
 # commands
 
 cmd_list() {
-	echo "listing: $@"
+	case "$@" in
+		repos)
+			list_repos
+			;;
+		graphs)
+			list_graphs
+			;;
+		triples)
+			list_triples
+			;;
+		*)
+			echo "invalid argument: $@"
+			exit 1
+			;;
+	esac
 }
 
 cmd_query() {
@@ -67,6 +84,15 @@ cmd_add() {
 
 cmd_clear() {
 	echo "clearing: $@"
+}
+
+# util
+
+list_repos() {
+	pysrc='print "\n".join("%s: %s" % (item["id"]["value"], item["title"]["value"]) for item in data["results"]["bindings"])'
+	pysrc="import sys; import json; data = json.load(sys.stdin); $pysrc"
+	curl -s -H "Accept: application/sparql-results+json" "$host/repositories" | \
+			python -c "$pysrc"
 }
 
 # dispatch
