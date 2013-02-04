@@ -14,6 +14,9 @@ Options:
     display this help message
   -i
     include inferences
+  -f
+    output format
+    see http://www.openrdf.org/doc/sesame2/system/ch08.html#table-rdf-formats
   -r <repository>
     select repository
 
@@ -31,8 +34,11 @@ Commands:
 EOS
 }
 
-while getopts "hir:" option; do
+while getopts "f:hir:" option; do
 	case $option in
+		f)
+			format="$OPTARG"
+			;;
 		h)
 			usage
 			exit 1
@@ -88,11 +94,35 @@ cmd_clear() {
 
 # util
 
+ensure_repo() {
+	if [ -z "$repo" ]; then
+		echo "error: repository not specified"
+		exit 1
+	fi
+}
+
 list_repos() {
 	pysrc='print "\n".join("%s: %s" % (item["id"]["value"], item["title"]["value"]) for item in data["results"]["bindings"])'
 	pysrc="import sys; import json; data = json.load(sys.stdin); $pysrc"
 	curl -s -H "Accept: application/sparql-results+json" "$host/repositories" | \
-			python -c "$pysrc"
+		python -c "$pysrc"
+}
+
+list_graphs() {
+	ensure_repo
+	pysrc='print "\n".join(item["contextID"]["value"] for item in data["results"]["bindings"])'
+	pysrc="import sys; import json; data = json.load(sys.stdin); $pysrc"
+	curl -s -H "Accept: application/sparql-results+json" \
+			"$host/repositories/$repo/contexts" | \
+		python -c "$pysrc"
+}
+
+list_triples() {
+	ensure_repo
+	if [ -z "$format" ]; then
+		format="application/x-turtle"
+	fi
+	curl -s -H "Accept: $format" "$host/repositories/$repo/statements"
 }
 
 # dispatch
