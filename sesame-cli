@@ -40,6 +40,7 @@ if [ -z "$*" ]; then
 	exit 1
 fi
 
+include_inferences=false
 while getopts "f:hir:" option; do
 	case $option in
 		f)
@@ -98,7 +99,12 @@ cmd_query() {
 		format="application/sparql-results+json"
 	fi
 
-	curl -s -H "Accept: $format" "$host/repositories/$repo?query=$query"
+	uri="$host/repositories/$repo?query=$query"
+	if ! $include_inferences; then
+		uri="$uri&infer=false"
+	fi
+
+	curl -s -H "Accept: $format" "$uri"
 }
 
 cmd_add() {
@@ -143,7 +149,13 @@ list_triples() {
 	if [ -z "$format" ]; then
 		format="application/x-turtle"
 	fi
-	curl -s -H "Accept: $format" "$host/repositories/$repo/statements"
+
+	uri="$host/repositories/$repo/statements"
+	if ! $include_inferences; then
+		uri="$uri?infer=false"
+	fi
+
+	curl -s -H "Accept: $format" "$uri"
 }
 
 # dispatch
