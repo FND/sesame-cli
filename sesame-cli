@@ -92,7 +92,7 @@ cmd_query() {
 		query=`cat -`
 	fi
 	pysrc="import sys; import urllib; print urllib.quote(sys.stdin.read());"
-	query=`echo "$query" | python -c "$pysrc"`
+	query=`echo -n "$query" | python -c "$pysrc"`
 
 	if [ -z "$format" ]; then
 		format="application/sparql-results+json"
