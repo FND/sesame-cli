@@ -35,7 +35,7 @@ Commands:
 EOS
 }
 
-if [ -z "$@" ]; then
+if [ -z "$*" ]; then
 	usage
 	exit 1
 fi
